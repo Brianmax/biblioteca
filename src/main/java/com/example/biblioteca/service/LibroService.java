@@ -1,17 +1,20 @@
 package com.example.biblioteca.service;
 
 import com.example.biblioteca.dto.request.LibroCreateDto;
+import com.example.biblioteca.dto.response.LibroPrecioResponseDto;
 import com.example.biblioteca.dto.response.LibroResponseDto;
 import com.example.biblioteca.entity.AutorEntity;
 import com.example.biblioteca.entity.LibroEntity;
 import com.example.biblioteca.exception.BusinessException;
 import com.example.biblioteca.exception.ResourceNotFoundException;
+import com.example.biblioteca.helper.DescuentoHelper;
 import com.example.biblioteca.repository.AutorRepository;
 import com.example.biblioteca.repository.LibroRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -20,11 +23,13 @@ public class LibroService {
     private final LibroRepository libroRepository;
     private final AutorRepository autorRepository;
     private final ModelMapper modelMapper;
+    private final DescuentoHelper descuentoHelper;
 
-    public LibroService(LibroRepository libroRepository, AutorRepository autorRepository, ModelMapper modelMapper) {
+    public LibroService(LibroRepository libroRepository, AutorRepository autorRepository, ModelMapper modelMapper, DescuentoHelper descuentoHelper) {
         this.libroRepository = libroRepository;
         this.autorRepository = autorRepository;
         this.modelMapper = modelMapper;
+        this.descuentoHelper = descuentoHelper;
     }
 
     public LibroResponseDto saveLibro(LibroCreateDto dto) {
@@ -68,5 +73,31 @@ public class LibroService {
                     dto.setNombreAutor(libro.getAutor().getNombre() + " " + libro.getAutor().getApellido());
                     return dto;
                 }).toList();
+    }
+
+    public LibroPrecioResponseDto calcularPrecioFinal(UUID id) {
+        Optional<LibroEntity> libroOptional = libroRepository.findById(id);
+        if (libroOptional.isEmpty()) {
+            throw new ResourceNotFoundException("Libro no encontrado con id: " + id);
+        }
+        LibroEntity libro = libroOptional.get();
+        AutorEntity autor = libro.getAutor();
+
+        // < 3 libros -> 0 por ciento
+        // 3 a 5 libros -> 10 por ciento
+        // 6 o mas -> 20 por ciento
+
+        int cantidadLibros = autor.getLibros().size();
+        double porcentaje = descuentoHelper.calcularPorcentajeDescuento(cantidadLibros);
+        double precioFinal = descuentoHelper.aplicarDescuento(libro.getPrecio(), porcentaje);
+
+        LibroPrecioResponseDto responseDto = new LibroPrecioResponseDto();
+        responseDto.setId(libro.getId());
+        responseDto.setTitulo(libro.getTitulo());
+        responseDto.setNombreAutor(libro.getAutor().getNombre());
+        responseDto.setPrecioOriginal(libro.getPrecio());
+        responseDto.setPorcentajeDescuento(porcentaje);
+        responseDto.setPrecioFinal(precioFinal);
+        return responseDto;
     }
 }
