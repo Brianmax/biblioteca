@@ -1,7 +1,7 @@
 package com.example.biblioteca.controller;
 
 import com.example.biblioteca.dto.request.CategoriaCreateDto;
-import com.example.biblioteca.dto.response.ApiResponse;
+import com.example.biblioteca.dto.response.ResponseApi;
 import com.example.biblioteca.dto.response.CategoriaResponseDto;
 import com.example.biblioteca.service.CategoriaService;
 import jakarta.validation.Valid;
@@ -23,26 +23,26 @@ public class CategoriaController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<CategoriaResponseDto>> save(@Valid @RequestBody CategoriaCreateDto dto) {
+    public ResponseEntity<ResponseApi<CategoriaResponseDto>> save(@Valid @RequestBody CategoriaCreateDto dto) {
         CategoriaResponseDto response = categoriaService.saveCategoria(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(true, "Categoría creada", response));
+                .body(new ResponseApi<>(true, "Categoría creada", response));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<CategoriaResponseDto>> findById(@PathVariable UUID id) {
+    public ResponseEntity<ResponseApi<CategoriaResponseDto>> findById(@PathVariable UUID id) {
         CategoriaResponseDto response = categoriaService.findById(id);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(true, "Categoría encontrada", response));
+                .body(new ResponseApi<>(true, "Categoría encontrada", response));
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CategoriaResponseDto>>> findAll() {
+    public ResponseEntity<ResponseApi<List<CategoriaResponseDto>>> findAll() {
         List<CategoriaResponseDto> response = categoriaService.findAll();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(true, "Categorías encontradas", response));
+                .body(new ResponseApi<>(true, "Categorías encontradas", response));
     }
 }

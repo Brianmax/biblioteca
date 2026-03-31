@@ -1,7 +1,7 @@
 package com.example.biblioteca.controller;
 
 import com.example.biblioteca.dto.request.LibroCreateDto;
-import com.example.biblioteca.dto.response.ApiResponse;
+import com.example.biblioteca.dto.response.ResponseApi;
 import com.example.biblioteca.dto.response.LibroResponseDto;
 import com.example.biblioteca.service.LibroService;
 import jakarta.validation.Valid;
@@ -23,26 +23,26 @@ public class LibroController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<LibroResponseDto>> save(@Valid @RequestBody LibroCreateDto dto) {
+    public ResponseEntity<ResponseApi<LibroResponseDto>> save(@Valid @RequestBody LibroCreateDto dto) {
         LibroResponseDto response = libroService.saveLibro(dto);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(new ApiResponse<>(true, "Libro creado", response));
+                .body(new ResponseApi<>(true, "Libro creado", response));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<LibroResponseDto>> findById(@PathVariable UUID id) {
+    public ResponseEntity<ResponseApi<LibroResponseDto>> findById(@PathVariable UUID id) {
         LibroResponseDto response = libroService.findById(id);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(true, "Libro encontrado", response));
+                .body(new ResponseApi<>(true, "Libro encontrado", response));
     }
 
     @GetMapping("/autor/{autorId}")
-    public ResponseEntity<ApiResponse<List<LibroResponseDto>>> findByAutor(@PathVariable UUID autorId) {
+    public ResponseEntity<ResponseApi<List<LibroResponseDto>>> findByAutor(@PathVariable UUID autorId) {
         List<LibroResponseDto> response = libroService.findByAutorId(autorId);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(new ApiResponse<>(true, "Libros encontrados", response));
+                .body(new ResponseApi<>(true, "Libros encontrados", response));
     }
 }
