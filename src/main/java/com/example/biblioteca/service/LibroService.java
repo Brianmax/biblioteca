@@ -100,4 +100,8 @@ public class LibroService {
         responseDto.setPrecioFinal(precioFinal);
         return responseDto;
     }
+    // un endpoint que recibe el ID de un autor y devuelve cuanto descuento aplica sobre sus libros segun
+    // la cantidad que tiene publicados
+    // Para autores con nacionalidad Peruana se aplica un 10 porciento de descuento adicional
+
 }
